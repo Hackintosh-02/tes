@@ -7,7 +7,9 @@ import Link from "next/link";
 const Navbar = ({ session }: { session: UserResponse }) => {
   return (
     <div className="px-6 py-4 h-16 flex border-b shadow-md justify-between items-center">
-      <div>Logo</div>
+      <Link className="text-3xl font-bold" href={"/"}>
+        Safar
+      </Link>
       <div>
         <>
           {session.error && (

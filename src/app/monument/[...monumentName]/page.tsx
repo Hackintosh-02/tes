@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { monuments } from "@/constant";
 import { Button } from "@/components/ui/button";
 import { BookingForm } from "@/components/forms/booking-form";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 const Page = ({
   params,
 }: {
@@ -30,6 +31,7 @@ const Page = ({
   };
 }) => {
   const [open, setOpen] = useState(false);
+  const [bookingID, setBookingID] = useState<string>("");
   const filteredMonument = monuments.find(
     (monument) => monument.name == params.monumentName
   );
@@ -112,9 +114,25 @@ const Page = ({
                 </DialogDescription>
               </DialogHeader>
               <BookingForm
+                setBookingID={setBookingID}
                 setOpen={setOpen}
                 ticketprice={filteredMonument.price}
               />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={bookingID ? true : false}>
+            {/* <DialogTrigger asChild>
+              <Button variant="secondary">Book Tickets</Button>
+            </DialogTrigger> */}
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>QR Code</DialogTitle>
+                <DialogDescription>Download this QR code</DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-center items-center">
+                <QRCodeGenerator bookingID={bookingID} />
+              </div>
             </DialogContent>
           </Dialog>
         </div>

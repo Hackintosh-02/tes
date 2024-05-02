@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-
+import { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 
 interface BookingProps extends React.HTMLAttributes<HTMLDivElement> {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setBookingID: React.Dispatch<React.SetStateAction<string>>;
   ticketprice: {
     adults: string;
     children: string;
@@ -51,6 +52,7 @@ export function BookingForm({
   className,
   ticketprice,
   setOpen,
+  setBookingID,
   ...props
 }: BookingProps) {
   const { toast } = useToast();
@@ -81,8 +83,16 @@ export function BookingForm({
       }
 
       const { childrens, adults, date } = data;
-      const res = await bookTicket({ user_id, price, childrens, adults, date });
+      const res = await bookTicket({
+        user_id,
+        price,
+        childrens,
+        adults,
+        date,
+      });
       form.reset();
+      const responseData = await JSON.parse(res);
+      setBookingID(responseData.data[0].id);
       setOpen((prev) => !prev);
       if (res) {
         toast({
