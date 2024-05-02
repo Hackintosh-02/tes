@@ -60,28 +60,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       reset();
       console.log(error);
     }
-    // try {
-    //   const token = await handleLogin(data);
-    //   reset();
-    //   if (token.error == null) {
-    //     router.push("/dashboard");
-    //     router.refresh();
-    //     toast({
-    //       variant: "default",
-    //       title: "Welcome back!.",
-    //       description: "Login Successful",
-    //     });
-    //   } else
-    //     toast({
-    //       variant: "destructive",
-    //       title: "Uh oh! Something went wrong.",
-    //       description: token.error,
-    //       action: <ToastAction altText="Try again">Try again</ToastAction>,
-    //     });
-    // } catch (error) {
-    //   reset();
-    //   console.log("login error", error);
-    // }
   }
 
   return (

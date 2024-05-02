@@ -11,7 +11,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { registerFormSchema } from "@/lib/schema";
-// import { handleLogin } from "@/services/actions/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import Link from "next/link";
@@ -37,12 +36,13 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
       const res = await signup(data);
       const user = await JSON.parse(res);
       reset();
-      if (user.data.data) {
+      console.log(user);
+      if (user.data.user) {
         router.push("/");
         router.refresh();
         toast({
           variant: "default",
-          title: "Welcome back!.",
+          title: "Welcome!",
           description: "Signup Successful",
         });
       } else {
@@ -90,6 +90,25 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-2">
+            <div>
+              <Label className="sr-only" htmlFor="username">
+                Email
+              </Label>
+              <Input
+                {...register("username", { required: true })}
+                id="username"
+                placeholder="John Doe"
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                disabled={isSubmitting}
+              />
+              {errors?.username && (
+                <p className="text-red-600 text-sm">
+                  {errors?.username?.message}
+                </p>
+              )}
+            </div>
             <div>
               <Label className="sr-only" htmlFor="email">
                 Email
