@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
+// fix
 import { Toaster } from "@/components/ui/toaster";
 import { createClient } from "@/utils/supabase/server";
 const inter = Inter({ subsets: ["latin"] });
