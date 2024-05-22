@@ -22,7 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { monuments } from "@/constant";
 import { Button } from "@/components/ui/button";
 import { BookingForm } from "@/components/forms/booking-form";
-import QRCodeGenerator from "@/components/QRCodeGenerator";
+import QRCodeGenerator from "@/components/qrCodeGenerator";
 const Page = ({
   params,
 }: {
