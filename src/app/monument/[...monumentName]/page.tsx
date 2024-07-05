@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,8 @@ const Page = ({
     monumentName: string;
   };
 }) => {
+  const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const [bookingID, setBookingID] = useState<string>("");
   const filteredMonument = monuments.find(
@@ -133,6 +136,14 @@ const Page = ({
               <div className="flex justify-center items-center">
                 <QRCodeGenerator bookingID={bookingID} />
               </div>
+              <Button
+                type="button"
+                onClick={() => {
+                  router.push(`/`);
+                }}
+              >
+                Close
+              </Button>
             </DialogContent>
           </Dialog>
         </div>
