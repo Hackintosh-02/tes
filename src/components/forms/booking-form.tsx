@@ -1,10 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { QRCodeSVG } from "qrcode.react"; // Import QRCodeSVG from qrcode.react
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { bookingSchema } from "@/lib/schema";
@@ -12,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "../ui/use-toast";
 import { createClient } from "@/utils/supabase/client";
 import { ToastAction } from "@radix-ui/react-toast";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "../ui/button";
 import {
@@ -60,9 +60,9 @@ export function BookingForm({
     children: "0",
     adult: "0",
   });
-  //   console.log(parseInt(ticketprice.adults), parseInt(ticketprice.children));
   const router = useRouter();
   const [price, setPrice] = React.useState("0");
+  const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null); // State for QR code value
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
@@ -80,39 +80,51 @@ export function BookingForm({
           title: "Uh oh! Something went wrong.",
           action: <ToastAction altText="Try again">Try again</ToastAction>,
         });
+        return;
       }
 
       const { childrens, adults, date } = data;
+      const totalPrice =
+        parseInt(ticketprice.adults) * parseInt(adults) +
+        parseInt(ticketprice.children) * parseInt(childrens);
+
+      // Book the ticket and store booking ID
       const res = await bookTicket({
         user_id,
-        price,
+        price: totalPrice.toString(),
         childrens,
         adults,
         date,
       });
-      form.reset();
       const responseData = await JSON.parse(res);
       setBookingID(responseData.data[0].id);
-      setOpen((prev) => !prev);
-      if (res) {
-        toast({
-          variant: "default",
-          title: "Success",
-          description: "Ticked Successfully Booked",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
-      }
-      console.log(res);
+      setOpen(false);
+
+      // Generate the QR code value with booking details
+      const qrData = {
+        user_id,
+        date,
+        adults,
+        childrens,
+        totalPrice,
+      };
+      setQrCodeValue(JSON.stringify(qrData)); // Store booking data in QR code
+
+      toast({
+        variant: "default",
+        title: "Success",
+        description: "Ticket Successfully Booked",
+      });
     } catch (error) {
-      form.reset();
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Something went wrong while booking the ticket",
+      });
       console.log(error);
     }
   }
+
   const handleTicketChange = (type: string, value: string) => {
     setTickets((prevTickets) => ({
       ...prevTickets,
@@ -128,6 +140,7 @@ export function BookingForm({
     <div className={cn("grid gap-6 p-6", className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Date of Visit Form Field */}
           <FormField
             control={form.control}
             name="date"
@@ -169,6 +182,8 @@ export function BookingForm({
               </FormItem>
             )}
           />
+
+          {/* Childrens and Adults Form Fields */}
           <div className="flex space-x-6 items-center">
             <FormField
               control={form.control}
@@ -201,6 +216,7 @@ export function BookingForm({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="adults"
@@ -233,10 +249,20 @@ export function BookingForm({
               )}
             />
           </div>
+
+          {/* Total Price */}
           <h3>Total: Rs{price}</h3>
           <Button type="submit">Book now</Button>
         </form>
       </Form>
+
+      {/* Show QR Code if available */}
+      {qrCodeValue && (
+        <div>
+          <h3>Your Ticket QR Code:</h3>
+          <QRCodeSVG value={qrCodeValue} size={256} />
+        </div>
+      )}
     </div>
   );
 }
