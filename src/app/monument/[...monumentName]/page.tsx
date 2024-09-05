@@ -11,8 +11,6 @@ import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,7 +21,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { monuments } from "@/constant";
 import { Button } from "@/components/ui/button";
 import { BookingForm } from "@/components/forms/booking-form";
-import QRCodeGenerator from "@/components/qrCodeGenerator";
+import QRCodeGenerator from "@/components/qrCodeGenerator"; // Import QRCodeGenerator
+
 const Page = ({
   params,
 }: {
@@ -34,11 +33,12 @@ const Page = ({
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
-  const [bookingID, setBookingID] = useState<string>("");
+  const [bookingID, setBookingID] = useState<string>(""); // Track booking ID
   const filteredMonument = monuments.find(
     (monument) => monument.name == params.monumentName
   );
   if (!filteredMonument) return null;
+
   return (
     <div className="pt-6 flex flex-col space-y-4">
       <h1 className="text-5xl font-bold capitalize ml-12">
@@ -112,26 +112,21 @@ const Page = ({
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Book Tickets</DialogTitle>
-                <DialogDescription>
-                  Enter the required details to book tickets
-                </DialogDescription>
+                <BookingForm
+                  setBookingID={setBookingID}
+                  setOpen={setOpen}
+                  ticketprice={filteredMonument.price}
+                />
               </DialogHeader>
-              <BookingForm
-                setBookingID={setBookingID}
-                setOpen={setOpen}
-                ticketprice={filteredMonument.price}
-              />
             </DialogContent>
           </Dialog>
 
-          <Dialog open={bookingID ? true : false}>
-            {/* <DialogTrigger asChild>
-              <Button variant="secondary">Book Tickets</Button>
-            </DialogTrigger> */}
+          {/* Show QR Code in dialog if bookingID is set */}
+          <Dialog open={!!bookingID}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>QR Code</DialogTitle>
-                <DialogDescription>Download this QR code</DialogDescription>
+                <p>Download this QR code</p>
               </DialogHeader>
               <div className="flex justify-center items-center">
                 <QRCodeGenerator bookingID={bookingID} />

@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
+import React, { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { QRCodeSVG } from "qrcode.react"; // Import QRCodeSVG from qrcode.react
+import QRCode from "react-qr-code"; // Import QRCode from react-qr-code
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { bookingSchema } from "@/lib/schema";
@@ -63,6 +63,7 @@ export function BookingForm({
   const router = useRouter();
   const [price, setPrice] = React.useState("0");
   const [qrCodeValue, setQrCodeValue] = React.useState<string | null>(null); // State for QR code value
+  const qrCodeRef = React.useRef<HTMLDivElement>(null); // Reference for QR code div
   const form = useForm<z.infer<typeof bookingSchema>>({
     resolver: zodResolver(bookingSchema),
   });
@@ -134,6 +135,26 @@ export function BookingForm({
       parseInt(tickets.adult) * parseInt(ticketprice.adults) +
       parseInt(tickets.children) * parseInt(ticketprice.children);
     setPrice(newPrice.toString());
+  };
+
+  // Function to download the QR code
+  const downloadQRCode = () => {
+    if (!qrCodeRef.current) return;
+
+    const svgElement = qrCodeRef.current.querySelector("svg");
+    if (!svgElement) return;
+
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgElement);
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "qr-code.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   };
 
   return (
@@ -260,7 +281,12 @@ export function BookingForm({
       {qrCodeValue && (
         <div>
           <h3>Your Ticket QR Code:</h3>
-          <QRCodeSVG value={qrCodeValue} size={256} />
+          <div ref={qrCodeRef}>
+            <QRCode value={qrCodeValue} size={256} />
+          </div>
+          <Button onClick={downloadQRCode} className="mt-4">
+            Download QR Code
+          </Button>
         </div>
       )}
     </div>
